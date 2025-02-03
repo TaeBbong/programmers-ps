@@ -1,0 +1,61 @@
+# 두 큐 합 같게 만들기
+
+문제 정보 : 큐/아이디어/구현/lv2
+
+문제는 되게 심플함. 그냥 노가다 시뮬레이션 하면서 queue 두개의 합이 같아질 때를 return 하면 됨
+언제나 그렇듯 안되는 조건을 적절히 찾아줘야 시간초과가 안뜸
+
+내 아이디어는
+1. 애초에 전체 합이 홀수
+2. 제일 큰 원소 값이 전체 합의 절반을 넘어갈 때
+3. 돌다가 한쪽 큐가 비게 될 때
+4. 시도 횟수가 대충 n * 3 정도가 되었을 때(한바퀴 돌아서 원위치 했다고 가정)
+
+요정도였는데, 이러면 사실 잘 했다고 생각.
+근데 결정적으로 놓친 실수 2개는
+
+1. 매번 sum을 돌리면 O(n)만큼 돌겠지..
+2. del a[0] => O(n)짜리 안좋은 방법.. deque.popleft() => O(1)짜리 갓갓 방법
+
+웬만하면 deque를 사용하자....
+
+from collections import deque
+
+def solution(q1, q2):
+    answer = 0
+    n = len(q1)
+    s1 = sum(q1)
+    s2 = sum(q2)
+    
+    if (s1 + s2) % 2 == 1:
+        return -1
+    
+    half = (s1 + s2) // 2
+    if max(q1) > half or max(q2) > half:
+        return -1
+    
+    d1 = deque(q1)
+    d2 = deque(q2)
+    
+    while True:
+        if answer > n * 3 - 3:
+            return -1
+        if len(d1) == 0 or len(d2) == 0:
+            return -1
+        if s1 == s2:
+            return answer
+        
+        if s1 > s2:
+            p = d1.popleft()
+            d2.append(p)
+            s1 -= p
+            s2 += p
+        else:
+            p = d2.popleft()
+            d1.append(p)
+            s1 += p
+            s2 -= p
+            
+        answer += 1
+    
+    return -1
