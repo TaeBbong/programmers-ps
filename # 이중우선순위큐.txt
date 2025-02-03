@@ -1,0 +1,145 @@
+# 이중우선순위큐
+
+일반적인 우선순위큐(min/max)를 두번 적용하여,
+min 또는 max에 대한 pop이 가능한 구조 만들기
+
+문제 풀이를 위해서는 그냥 sort를 해도 무방하지만,
+개념 이해를 위해 일반적인 우선순위큐(heap)을 구현해보는 것이 목표
+나아가 이중우선순위큐는 heapq라이브러리를 활용해 synchronize 하는 것을 구현해보기
+
+from enum import Enum
+
+
+class HeapType(Enum):
+    MIN = 1
+    MAX = 2
+
+
+class Heap:
+    def __init__(self, htype):
+        self.data = []
+        self.htype = htype
+        
+    def __str__(self):
+        return f'{self.data}'
+        
+    def is_empty(self):
+        return len(self.data) == 0
+        
+    def compare(self, parent, child):
+        if self.htype == HeapType.MIN:
+            if parent > child:
+                return True
+            return False
+        if self.htype == HeapType.MAX:
+            if parent < child:
+                return True
+            return False
+        
+    def push(self, value):
+        # append to last element of tree
+        self.data.append(value)
+        # heap-up value's index(last)
+        self._heap_up(len(self.data) - 1)
+        
+    def pop(self):
+        if self.is_empty():
+            raise IndexError("Heap is Empty")
+        
+        root = self.data[0]
+        if len(self.data) == 1:
+            self.data = []
+            return root
+        
+        self.data[0] = self.data.pop()
+        
+        if not self.is_empty():
+            self._heap_down(0)
+        
+        return root
+        
+    def _heap_up(self, index):
+        parent_index = (index - 1) // 2
+        
+        if index > 0 and self.compare(self.data[parent_index], self.data[index]):
+            self.data[parent_index], self.data[index] = self.data[index], self.data[parent_index]
+            self._heap_up(parent_index)
+            
+    def _heap_down(self, index):
+        left_child = 2 * index + 1
+        right_child = 2 * index + 2
+        min_or_max = index
+        
+        if left_child < len(self.data) and self.compare(self.data[min_or_max], self.data[left_child]):
+            min_or_max = left_child
+        
+        if right_child < len(self.data) and self.compare(self.data[min_or_max], self.data[right_child]):
+            min_or_max = right_child
+            
+        if min_or_max != index:
+            self.data[min_or_max], self.data[index] = self.data[index], self.data[min_or_max]
+            self._heap_down(min_or_max)
+        
+
+class DoubleHeap:
+    def __init__(self):
+        self.min_heap = Heap(htype=HeapType.MIN)
+        self.max_heap = Heap(htype=HeapType.MAX)
+        self.entry_map = {}
+        self.size = 0
+        
+    def __str__(self):
+        return f'min_heap: {self.min_heap}\nmax_heap: {self.max_heap}\nentry_map: {self.entry_map}'
+        
+    def insert(self, value):
+        self.min_heap.push(value)
+        self.max_heap.push(value)
+        if value in self.entry_map:
+            self.entry_map[value] += 1
+        else:
+            self.entry_map[value] = 1
+        
+    def _synchronize(self, heap):
+        while not heap.is_empty():
+            if self.entry_map[heap.data[0]] == 0:
+                heap.pop()
+            else:
+                break
+                
+    
+    def delete_min(self):
+        self._synchronize(self.min_heap)
+        if not self.min_heap.is_empty():
+            value = self.min_heap.pop()
+            self.entry_map[value] -= 1
+            self._synchronize(self.max_heap)
+            return value
+        
+    def delete_max(self):
+        self._synchronize(self.max_heap)
+        if not self.max_heap.is_empty():
+            value = self.max_heap.pop()
+            self.entry_map[value] -= 1
+            self._synchronize(self.min_heap)
+            return value
+        
+    def is_real_empty(self):
+        return self.size == 0
+        
+def solution(operations):
+    answer = []
+    dheap = DoubleHeap()
+    for op in operations:
+        action, value = op.split(' ')
+        if action == 'I':
+            dheap.insert(int(value))
+        else:
+            if int(value) == -1:
+                res = dheap.delete_min()
+            else:
+                res = dheap.delete_max()
+    
+    if dheap.max_heap.is_empty() or dheap.min_heap.is_empty():
+        return [0, 0]
+    
+    return [dheap.max_heap.data[0], dheap.min_heap.data[0]]

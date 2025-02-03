@@ -1,0 +1,76 @@
+# 단어 변환
+
+문제 정보 : 프로그래머서 lv3, bfs
+
+hit -> hot -> dot -> dog -> cog
+
+결국 각 단어들은 1개만 다른 단어끼리 연결되어 있는 맵이고,
+이 연결된 그래프를 기반으로 탐색을 돌리면 된다
+최단 경로를 찾는 문제이므로 bfs를 통해 계층을 확인하면 되겠다.
+오랜만에 bfs를 구현해봤음..
+
+## 풀이
+
+from collections import deque
+
+
+def strCmp(str1, str2):
+    l1 = list(str1)
+    l2 = list(str2)
+    
+    count = 0
+    for i, s1 in enumerate(str1):
+        if s1 != str2[i]:
+            count += 1
+    
+    return count == 1
+            
+
+def words2map(begin, words):
+    board = {}
+    board[begin] = []
+    
+    for word in words + [begin]:
+        board[word] = []
+        for nword in words:
+            if nword == word:
+                continue
+            if strCmp(word, nword):
+                if nword not in board[word]:
+                    board[word].append(nword)
+                if nword in board.keys():
+                    if word not in board[nword]:
+                        board[nword].append(word)
+                else:
+                    board[nword] = [word]
+    
+    return board
+
+
+def bfs(begin, target, board):
+    queue = deque([(begin, 0)])
+    check = {}
+    
+    while queue:
+        now = queue.popleft()
+        check[now[0]] = True
+        # print(f'queue: {queue}')
+        # print(f'now: {now}')
+        for word in board[now[0]]:
+            if word not in check.keys():
+                queue.append((word, now[1] + 1))
+                if word == target:
+                    # print(f'match at {word}')
+                    return now[1] + 1
+    return 0
+
+
+def solution(begin, target, words):
+    answer = 0
+    if target not in words:
+        return 0
+    
+    board = words2map(begin, words)
+    answer = bfs(begin, target, board)
+    
+    return answer

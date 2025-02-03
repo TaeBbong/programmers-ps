@@ -1,0 +1,28 @@
+# 입국심사
+
+문제 정보 : 프로그래머스 lv3, 이분탐색
+
+유명한 이분탐색 문제. 쉽다 쉬워.
+그래도 이분탐색은 언제나 리턴할 때 경계 조건 정리하는게 괜히 어려운데,
+오늘은 좀 심플하게 하니까 잘 된듯..
+
+
+def binarySearch(s, e, n, times):
+    m = (s + e) // 2
+    capability = sum([m // i for i in times])
+    # print(s, e, m, capability)
+    if capability < n:
+        return binarySearch(m + 1, e, n, times)
+    else:
+        if s == e:
+            return m
+        return binarySearch(s, m, n, times)
+
+
+def solution(n, times):
+    answer = 0
+    MAX_TIME = (n // len(times) + 1) * max(times)
+    
+    answer = binarySearch(1, MAX_TIME, n, times)
+    
+    return answer

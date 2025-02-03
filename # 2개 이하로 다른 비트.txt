@@ -1,0 +1,61 @@
+# 2개 이하로 다른 비트
+
+문제 정보 : 프로그래머스 lv2, bit 연산
+
+비트가 2개 이하로 다른, 자신보다 크지만 가장 작은 수를 찾는 문제로,
+원래는 완전 무식한 방법하려다가 xor을 하면 같으면 0 다르면 1이니까
+1의 개수가 2이하인 수를 찾으면 되겠다 싶어서 구현했었는데 시간초과가 났음
+더 짧은 풀이를 찾아야 했고, 결국 결정하는 방법밖에 없겠다 싶었음
+하나씩 대입해보면서 규칙을 찾아보면,
+
+짝수 : + 1
+홀수 : 가장 작은 0을 1로 바꾸고, 그 전 1을 0으로 바꾸기
+==> num + 2 ** 가장 작은 0의 자리 - 2 ** 가장 작은 0의 자리 앞의 1의 자리
+
+그래서 아래와 같이 구현했음
+
+'''
+시간초과풀이(xor)
+def minBit(num):
+    i = num + 1
+    while True:
+        diff = num ^ i
+        if bin(diff).count('1') <= 2:
+            return i
+        i += 1
+    return -1
+
+
+def solution(numbers):
+    answer = []
+    for num in numbers:
+        answer.append(minBit(num))
+    return answer
+'''
+def minBit(num):
+    if num % 2 == 0:
+        return num + 1
+    bin_num = '0' + bin(num)[2:]
+    bin_num = bin_num[::-1]
+    zero = bin_num.find('0')
+    return num + 2 ** zero - 2 ** (zero - 1)
+
+
+def solution(numbers):
+    answer = []
+    for num in numbers:
+        answer.append(minBit(num))
+    return answer
+
+근데 이것보다 더 간단한 방식은
+
+def solution(numbers):
+    answer = []
+    for idx, val in enumerate(numbers):
+        answer.append(((val ^ (val+1)) >> 2) +val +1)
+
+    return answer
+
+이건데, 역시 개념적으로는 동일함
+근데 가장 작은 0을 찾는 방식을 xor을 사용해서 처리..
+비트연산은 역시 수학적인 개념이 잘 잡혀있어야 머리가 빨리 돌아가는 듯

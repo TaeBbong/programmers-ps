@@ -1,0 +1,46 @@
+# 양과 늑대
+
+문제 정보 : 프로그래머스 lv3, DFS with idea, tree?
+
+풀이
+
+아직 완벽하게 이해되지는 않았으나...
+
+일단 개념적으로 모든 경우의 수를 다 확인해야 하는 방식임
+근데 단순한 DFS 순회로는 할 수 없는 것이,
+이미 방문한 노드를 다시 갈 수 있기 때문에..
+그래서 다음으로 갈 수 있는 노드를 선택하는 과정이 중요한데
+그것은 바로 부모는 방문한 적 있으나 자식은 방문한 적 없는 자식을 찾아가는 방식임
+왜냐면 부모가 방문한 적이 있어야 그 부모가 어디에 있든 다시 그 부모까지는 무조건 갈 수 있다는 거고,
+그러면 그 하위의 자식을 방문할 수 있게 됨
+이렇게 하면 모든 노드를 후보지에 놓고 갈 수 있는 곳을 전부 갈 수 있으며,
+탐색간 양과 늑대의 수를 비교하여 늑대가 양과 같아지는 순간 return을 때려버려 이후 진행을 못한다고 알려 줄 수 있음
+과정 중에 양의 수를 리스트에 넣고 저장해놓다가 다 돌고나서 max 값만 정답으로 리턴하면 됨
+
+어렵다.....
+
+
+def dfs(sheep, wolf, info, edges, visited, sheeps):
+    if sheep > wolf:
+        sheeps.append(sheep)
+    else:
+        return
+
+    for parent, child in edges:
+        if visited[parent] and not visited[child]:
+            visited[child] = True
+            if info[child] == 0:
+                dfs(sheep + 1, wolf, info, edges, visited, sheeps)
+            else:
+                dfs(sheep, wolf + 1, info, edges, visited, sheeps)
+            visited[child] = False
+
+
+def solution(info, edges):
+    sheeps = []
+    visited = [False] * len(info)
+    visited[0] = True
+
+    dfs(1, 0, info, edges, visited, sheeps)
+
+    return max(sheeps)

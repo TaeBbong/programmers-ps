@@ -1,0 +1,79 @@
+# 금과 은 운반하기
+
+문제 정보: 프로그래머스 lv3, 이분탐색 + 그리디(수학)
+
+사실 웬만큼 문제 풀어보면 이건 이분탐색이라는 느낌이 바로 옴
+어차피 시간 선형적으로 결정되기 때문에, 최소 시간을 찾아가는 느낌으로 구현 가능
+이 문제에서의 크럭스는 그래서 제시된 시간안에 금과 은을 달성할 수 있는가, 를 판단하는 방법..
+
+단순히 생각했을 때 트럭이 금과 은을 동시에 운반할 수 있고, 
+마을마다 금과 은의 분배 비율이 다르기 때문에,
+A마을의 트럭은 금을 우선, B마을의 트럭은 은을 우선 이런 식으로 최적의 옮기기 알고리즘 찾기로 매몰될 수 있다.
+실제로 매몰되었음....
+
+여기서 수학적인 증명이 들어가지는데,
+모든 마을들에서 금을 우선으로 옮겼을 때 각각 옮겨진 금과 은의 총합을 Gmax, Smin,
+반대로 은을 우선으로 옮겼을 때를 Gmin, Smax라고 했을 때
+Gmax + Smin = Gmin + Smax = 제한된 시간동안 옮길 수 있는 총 광물의 수
+요건 자명하다. 제한된 시간동안 놀지 않고 뭐든 옮겼다는 것이기 때문에 총합이 같은 것은 자명
+
+만약 이때 Gmax >= a, Smax >= b, Gmin + Smax = Gmax + Smin >= a + b라면 해당 시간에 목표 광물을 다 옮길 수 있다 => 이게 이 문제의 달성 포인트
+참고한 증명 부분을 간단히 요약해보자면,
+벡터를 그려서 이때 g + s = W : g와 s는 기울기가 -1인 선분을 유지
+이에 대한 벡터 합 또한 기울기가 -1을 유지
+
+sum(W[i]) - (a, b)가 1사분면을 지나면 a와 b만큼 옮길 수 있다. == Gmax >= a, Smax >= b, Gmin + Smax = Gmax + Smin >= a + b 이런 그림으로 그려진다.
+
+솔직히 아직 잘 이해는 안됨..
+
+Gmax >= a, Smax >= b, Gmin + Smax = Gmax + Smin >= a + b 근데 요 수식은 꽤 직관적으로 이해는 됨
+각각 조건도 만족시키면서 전체 합도 유지가 되어야 하는..
+세부 증명은 좀 어려웡..
+
+
+def binary(start, end, data):
+    if start >= end:
+        return start
+
+    a, b, g, s, w, t = data['a'], data['b'], data['g'], data['s'], data['w'], data['t']
+    mid = (start + end) // 2
+
+    moved_gold = 0
+    moved_silver = 0
+    moved_total = 0
+
+    for i in range(len(t)):
+        move_cnt = mid // t[i]
+        carry_cnt = 0
+        if move_cnt % 2 == 1:
+            carry_cnt = move_cnt // 2 + 1
+        else:
+            carry_cnt = move_cnt // 2
+
+        moved_gold += min(carry_cnt * w[i], g[i])
+        moved_silver += min(carry_cnt * w[i], s[i])
+        moved_total += min(carry_cnt * w[i], g[i] + s[i])
+
+    if moved_gold >= a and moved_silver >= b and moved_total >= a + b:
+        return binary(start, mid, data)
+    else:
+        return binary(mid + 1, end, data)
+
+
+def solution(a, b, g, s, w, t):
+    answer = 4 * 10 ** 14
+    start = 0
+    end = 4 * 10 ** 14
+
+    data = {
+        'a': a, 
+        'b': b,
+        'g': g,
+        's': s,
+        'w': w,
+        't': t,
+    }
+
+    answer = binary(start, end, data)
+
+    return answer
