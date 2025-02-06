@@ -1,0 +1,40 @@
+# 스티커 모으기
+
+문제정보 : 그리디?dp? lv3
+
+a[n] = n을 선택했을 때 최대 값
+a[n] = n + max(a[n - 1], a[n - 2])
+
+이렇게 하니까 원형 구조에 대한 고려가 힘들어짐..
+원형구조를 해결하기 위한 기막힌 방법을 찾음(약간의 힌트와 함께)
+
+1) 첫번째 스티커를 꼭 사용하는 경우 -> 마지막 스티커와 두번째 스티커는 사용 X
+2) 마지막 스티커를 꼭 사용하는 경우 -> 첫번째 스티커는 사용 X
+
+이렇게 분기를 나눠서 dp를 두번 돌리면, 모든 경우를 커버할 수 있겠다 싶음..!
+왜 이 생각을 못했을 꼬..
+그리고 dp도 좀 더 세부적으로 미흡했는데,
+
+dp[i] = i번째 스티커까지 고려했을 때 최대 점수(==> i를 안 먹을 수도 있다는거..)
+생각해보니 위의 점화식 고려할 때에는 잘 작성했는데 n을 n-2일 때만 더해주는 꼴로 바꿨어야 했음..
+
+dp[i] = max(dp[i - 1], dp[i - 2] + sticker[i])
+이런 식으로 지금 i번째를 안먹고 그 전껄 가져갈 지도 함께 선택지에 넣어야 했음..
+
+def solution(sticker):
+    answer = 0
+    
+    if len(sticker) <= 3:
+        return max(sticker)
+    
+    # 1. start with Sticker0
+    dp = [sticker[0], sticker[0]]
+    for i in range(2, len(sticker) - 1):
+        dp.append(max(dp[i - 1], dp[i - 2] + sticker[i]))
+        
+    # 2. start with Sticker1
+    dp1 = [0, sticker[1]]
+    for i in range(2, len(sticker)):
+        dp1.append(max(dp1[i - 1], dp1[i - 2] + sticker[i]))
+    
+    return max(max(dp), max(dp1))
