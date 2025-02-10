@@ -1,0 +1,44 @@
+# 연속된 부분 수열의 합
+
+문제정보 : lv2, dp? 자료구조?
+
+오름차순으로 들어오는 배열에 대해 부분집합의 합이 k가 되는 최소길이의 구간을 찾기
+배열 크기는 100만...
+
+문제를 쪼개보면
+1) 합이 k가 되는 구간을 찾는다.
+2) 그 중에서 제일 짧은 구간 / 먼저 나오는 구간을 찾는다.
+
+누적합을 통해 구현해보자!
+
+1 2 3 4 5 / 7
+0 1 3 6 10 15
+10 - 6, 10 - 3 = 7!!
+15 - 10, 15 - 6..
+이런 느낌??
+match하면 바로 break고,
+k보다 커지면 바로 break
+이러면 n^2보단 빠르지 않을까 싶었는디 시간초과..
+
+def solution(sequence, k):
+    answer = []
+    partial = [0]
+    
+    tmp = 0
+    idx = -1
+    i = 0
+    for s in sequence:
+        tmp += s
+        i += 1
+        partial.append(tmp)
+        if idx == -1 and tmp >= k:
+            idx = i
+        
+    for s in range(idx, len(partial)):
+        for i in range(s - 1, -1, -1):
+            if partial[s] - partial[i] == k:
+                answer.append([i, s - 1])
+            elif partial[s] - partial[i] > k:
+                break
+    answer = sorted(answer, key=lambda x: (x[1] - x[0], x[0]))
+    return answer[0]
