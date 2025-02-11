@@ -42,3 +42,29 @@ def solution(sequence, k):
                 break
     answer = sorted(answer, key=lambda x: (x[1] - x[0], x[0]))
     return answer[0]
+
+생각해보니 i를 찾는 과정을 binsearch로 해결할만도??
+s는 고정해놓고, i를 x(0), y(s - 1)로 나눠서 m을 찾는 과정으로?
+
+맞았다!! 시간초과를 해결하는 적절한 방법이었음..
+근데 문제는 일단 틀리는 경우가 좀 있는데,
+
+def bin_search(x, y, s, k, partial):
+    if x >= y:
+        return []
+    i = (x + y) // 2
+    # print(x, y, i, s, partial[s] - partial[i])
+    if i < 0 or i >= s:
+        return []
+    
+    if partial[s] - partial[i] == k:
+        return [i, s - 1]
+    
+    if partial[s] - partial[i] > k:
+        return bin_search(i + 1, y, s, k, partial)
+    else:
+        return bin_search(x, i, s, k, partial)
+
+여기서 x>=y가 아니라 x > y여야 조건이 맞는데,
+x > y로 하면 재귀 횟수 초과 에러 발생..
+예제에서 이게 초과될 정도면 무조건 시간초과 발생 각
