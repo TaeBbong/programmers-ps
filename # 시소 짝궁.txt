@@ -1,0 +1,108 @@
+# 시소 짝궁
+
+문제 정보 : lv2
+
+4 3 2 1 0 1 2 3 4
+이렇게 시소가 있는데, 2, 3, 4에만 앉을 수 있다.
+여기서 사람들 몸무게가 주어졌을 때 짝궁이 될 수 있는 짝의 수를 찾아보자.
+
+[100,180,360,100,270]
+
+{100, 100} 은 서로 같은 거리에 마주보고 앉으면 균형을 이룹니다.
+{180, 360} 은 각각 4(m), 2(m) 거리에 마주보고 앉으면 균형을 이룹니다.
+{180, 270} 은 각각 3(m), 2(m) 거리에 마주보고 앉으면 균형을 이룹니다.
+{270, 360} 은 각각 4(m), 3(m) 거리에 마주보고 앉으면 균형을 이룹니다.
+
+2, 3, 4 각각 위치에 따른 비율을 알아보자.
+
+2-2, 3-3, 4-4 : 1.0
+2-3 : 1.5
+2-4 : 2
+3-4 : 4/3(1.33333...)
+
+즉 어떤 두 수가 위 비율 중 하나로 해당되면 짝이 되는거임!
+
+근데 사람 수는 10만으로, 10만명을 일일이 다 계산해보려면 n * (n - 1) // 2 * 4 => 한참 넘어감
+근데 또 몸무게는 100 ~ 1000이니까, 실제로는 990번씩만 계산하면 될듯?
+
+def solution(weights):
+    answer = 0
+    couples = set([])
+    count_dict = {}
+    weights_set = sorted(list(set(weights)))
+    
+    for w in weights:
+        if w not in count_dict.keys():
+            count_dict[w] = 1
+        else:
+            count_dict[w] += 1
+    
+    for i, w in enumerate(weights_set):
+        candidates = weights_set[i + 1:]
+        for c in candidates:
+            if w * 2 < c:
+                break
+            if w * 4 / 3 == int(w * 4 / 3):
+                if int(w * 4 / 3) == c:
+                    couples.add((w, c))
+            if w * 1.5 == int(w * 1.5):
+                if int(w * 1.5) == c:
+                    couples.add((w, c))
+            if w * 2 == c:
+                couples.add((w, c))
+    
+    for w in weights_set:
+        if count_dict[w] >= 2:
+            couples.add((w, w))
+    
+    return len(couples)
+
+일단 이렇게 짰는데, 문제가 알고보니 중복을 허용하고 있음...
+즉, 100 150 50 100
+이렇게 있다고 하면,
+100 50(0, 2)와 50 100(2, 3)은 다른 케이스로 각각 카운트 해야함...
+
+위처럼 짰으면 1.0 비율 따로, 그 외 비율 따로 식으로 계산해서 빨리 할 수 있는데
+인덱스가 추가되면 어떡하지..
+가 아니라 count_dict이 있으니까
+이걸로 각 경우에 대해 계산해서 덧셈?
+어차피 각 경우(couples)는 고유하니까??
+
+def get_possibles(w, c, count_dict):
+    return count_dict[w] * count_dict[c]
+
+
+def solution(weights):
+    answer = 0
+    couples = set([])
+    count_dict = {}
+    weights_set = sorted(list(set(weights)))
+    
+    for w in weights:
+        if w not in count_dict.keys():
+            count_dict[w] = 1
+        else:
+            count_dict[w] += 1
+    
+    for i, w in enumerate(weights_set):
+        candidates = weights_set[i + 1:]
+        for c in candidates:
+            if w * 2 < c:
+                break
+            if w * 4 / 3 == int(w * 4 / 3):
+                if int(w * 4 / 3) == c:
+                    answer += get_possibles(w, c, count_dict)
+            if w * 1.5 == int(w * 1.5):
+                if int(w * 1.5) == c:
+                    answer += get_possibles(w, c, count_dict)
+            if w * 2 == c:
+                answer += get_possibles(w, c, count_dict)
+    
+    for w in weights_set:
+        if count_dict[w] >= 2:
+            answer += (count_dict[w] * (count_dict[w] - 1)) // 2
+    
+    return answer
+
+
+성공!!!!
