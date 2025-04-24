@@ -1,0 +1,46 @@
+# 서버 증설 횟수
+
+문제 정보 : lv2, 구현(시뮬레이션)
+
+24시간 동안 1시간 마다 오는 유저 수가 주어질 때, 최소한의 횟수로 서버를 증설하여 유저를 모두 수용할 수 있는 서버 증설 횟수
+
+결국 모든 유저를 수용해야하므로, 01시부터 24시까지 시뮬레이션 돌리면 될듯?
+대신 서버 임대 시간이 있으니, 적절히 고려해서 쓰면 될듯
+
+```python
+import copy
+import math
+
+
+def solution(players, m, k):
+    answer = 0
+    server_status_map = []
+    
+    for i, users in enumerate(players):
+        if users < (len(server_status_map) + 1) * m:
+            pass
+        else:
+            new_servers = math.ceil((users - (len(server_status_map)) * m) // m)
+            for j in range(answer + 1, answer + new_servers + 1):
+                server_status_map.append((j, k))
+            answer += new_servers
+        updated_map = []
+        for idx, server in enumerate(server_status_map):
+            updated_server = (server[0], server[1] - 1)
+            if updated_server[1] <= 0:
+                pass
+            else:
+                updated_map.append(updated_server)
+        server_status_map = copy.deepcopy(updated_map)
+            
+    return answer
+```
+
+나는 1시간마다 실제 세상을 가상화하여 구현했음.
+(1시간 후에 상태를 보고 서버를 증설, 서버들의 상태를 리스트로 관리하여 매 시간마다 감소시키기까지)
+
+근데 다른 풀이 보니, 아예 24시간 동안 존재하는 서버 수를 리스트로 표현해서, 서버 1대 증설하면 해당 범위 기간만큼 리스트에 1씩 더해줬음.
+예를 들어 03시에 서버 증설했다면,
+[0, 0, 0, 1, 1, 1, 1, 1, 0, 0, ...]
+이렇게 말이다.
+이렇게 하면 증가만 시키면 되고 감소는 시킬 필요가 없으므로, 구현이 더 간단해질 듯
