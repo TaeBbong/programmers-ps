@@ -1,0 +1,63 @@
+# 가장 큰 수
+
+문제 정보 : lv2, 정렬
+
+0 또는 양의 정수가 주어졌을 때, 정수를 이어 붙여 만들 수 있는 가장 큰 수를 알아내 주세요.
+
+예를 들어, 주어진 정수가 [6, 10, 2]라면 [6102, 6210, 1062, 1026, 2610, 2106]를 만들 수 있고, 이중 가장 큰 수는 6210입니다.
+
+처음에 짰던 코드는
+
+from functools import cmp_to_key
+
+
+def compare(x, y):
+    xx = str(x)
+    yy = str(y)
+    common_len = min(len(xx), len(yy))
+    
+    if int(xx[:common_len]) > int(yy[:common_len]):
+        return 1
+    if int(xx[:common_len]) < int(yy[:common_len]):
+        return -1
+    
+    if len(xx) == len(yy):
+        return 0
+    
+    if len(xx) > len(yy):
+        if xx[0] <= xx[common_len]:
+            return 1
+        else:
+            return -1
+    if len(xx) < len(yy):
+        if yy[0] <= yy[common_len]:
+            return -1
+        else:
+            return 1
+    return 0
+        
+def solution(numbers):
+    numbers.sort(key=cmp_to_key(compare))
+    return ''.join([str(n) for n in numbers[::-1]])
+
+
+if __name__ == "__main__":
+    print(solution([6, 10, 2]))
+    print(solution([3, 30, 34, 5, 9]))
+
+이런 느낌으로, 새로 나오는 자리가 맨 앞보다 작으면 작은거고, 아니면 큰걸로 처리했음
+근데 이러니 232 23 의 경우에서, 맨 앞과 새로 나오는게 2로 동일한데, 23이 232보다 앞에 와야 맞기 때문에 잘못됨..
+최대 4자리니까 사실 일일이 비교하자는 마인드로 했었는데,
+
+def solution(numbers):
+    answer = ''.join(sorted([str(i) for i in numbers], key = lambda x : x*4, reverse = True))
+    return answer if len(answer) != answer.count('0') else '0'
+
+곱하기 4를 해서 4자리 이상으로 만든 다음에 비교하는 컨셉으로 갔다.
+
+6666 23232323 얘네를 비교하면 문자 관점에서는 6666이 더 크게 나온다.
+
+1. 비교를 문자로 해서 정렬이 편하게 하기
+2. 그런 관점에서 자리수를 늘려버리면 문제 요구사항을 해결할 수 있음..
+
+어렵다 이거 진짜루....
