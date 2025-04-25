@@ -61,3 +61,22 @@ def solution(numbers):
 2. 그런 관점에서 자리수를 늘려버리면 문제 요구사항을 해결할 수 있음..
 
 어렵다 이거 진짜루....
+
++ 추가
+
+내가 의도한 풀이랑 비슷한데 더 깔쌈한건 이거임
+
+import functools
+
+def comparator(a,b):
+    t1 = a+b
+    t2 = b+a
+    return (int(t1) > int(t2)) - (int(t1) < int(t2)) #  t1이 크다면 1  // t2가 크다면 -1  //  같으면 0
+
+def solution(numbers):
+    n = [str(x) for x in numbers]
+    n = sorted(n, key=functools.cmp_to_key(comparator),reverse=True)
+    answer = str(int(''.join(n)))
+    return answer
+
+하 이 cmp_to_key까지 찾아놓고 이 생각은 왜 못했지...
