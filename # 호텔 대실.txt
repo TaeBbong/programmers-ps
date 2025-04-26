@@ -1,0 +1,41 @@
+# 호텔 대실
+
+문제 정보 : lv2, 구현
+
+[["15:00", "17:00"], ["16:40", "18:20"], ["14:20", "15:20"], ["14:10", "19:20"], ["18:20", "21:20"]] => 3
+
+10분의 간격을 고려했을 때, 최소한의 방 수로 예약을 커버하는 방법
+
+결국엔 시뮬레이션을 구현하는건데, 어떻게 해야 깔쌈하게 구현할 수 있을지 생각해보자.
+
+1. 분 단위로 리스트를 만들고 +1을 하는 방법
+0 ~ (24 * 60 - 1) 만큼 크기의 리스트를 만들고, 초기화는 0으로
+15:00 ~ 17:00 이 들어오면,
+
+900 ~ (17 * 60) + 10 만큼 + 1
+
+이후 Max(list) 하면 될듯???
+
+```python
+def strToTime(s):
+    hour, minute = s.split(':')
+    return int(hour) * 60 + int(minute)
+
+
+def solution(book_time):
+    book_time_int = [[strToTime(i), strToTime(j) + 10] for [i, j] in book_time]
+    start_time = min([book[0] for book in book_time_int])
+    end_time = max([book[1] for book in book_time_int])
+    timeline = []
+    
+    for i in range(start_time, end_time + 1):
+        timeline.append(0)
+    
+    for book in book_time_int:
+        for t in range(book[0] - start_time, book[1] - start_time):
+            timeline[t] += 1
+    
+    return max(timeline)
+```
+
+정답으로 얼추 맞춘듯!!
