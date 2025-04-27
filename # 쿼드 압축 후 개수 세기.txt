@@ -1,0 +1,46 @@
+# 쿼드압축 후 개수 세기
+
+문제 정보 : lv2, 재귀, 구현
+
+4분면을 기준으로 한 분면이 다 같은 수면 합쳐버리고, 아니면 해당 분면을 4분면으로 다시 쪼개서 반복
+말그대로 쿼드 압축
+
+이건 뭐 생각할 것도 없이 구현인데, 까다롭다 느꼈던 것은
+2차원 배열을 잘 나눠서 탐색하는 것,
+재귀를 잘 돌리는 것
+
+def count_map(s):
+    result = [0, 0]
+    for ss in s:
+        result[0] += ss.count(0)
+        result[1] += ss.count(1)
+    return result
+
+
+def partial_map(arr, si, ei, sj, ej):
+    partial = []
+    for i in range(si, ei):
+        partial.append(arr[i][sj:ej])
+    return partial
+    
+
+def quad_zip(arr):
+    counts = count_map(arr)
+    if counts[0] == 0:
+        return [0, 1]
+    if counts[1] == 0:
+        return [1, 0]
+    
+    results = []
+    results.append(quad_zip(partial_map(arr, 0, len(arr) // 2, 0, len(arr) // 2)))
+    results.append(quad_zip(partial_map(arr, 0, len(arr) // 2, len(arr) // 2, len(arr))))
+    results.append(quad_zip(partial_map(arr, len(arr) // 2, len(arr), 0, len(arr) // 2)))
+    results.append(quad_zip(partial_map(arr, len(arr) // 2, len(arr), len(arr) // 2, len(arr))))
+    total = [sum(values) for values in zip(*results)]
+    return total
+
+
+def solution(arr):
+    return quad_zip(arr)
+
+이런건 넘파이 쓰면 좀 더 쉽겠지.. 그래도 밀린 숙제 잘 했다.
