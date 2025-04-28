@@ -1,0 +1,58 @@
+# 미로 탈출
+
+문제 정보 : lv2, bfs, 최단경로
+
+갈 수 있는 칸과 없는 칸이 구성된 맵에서 탈출하는 최단경로
+여기서 특이한 조건은,
+1. S와 E의 위치가 입력마다 고정 되어있지 않다.
+2. L이라는 레버가 있는데, 일단 첫번째 미션으로 레버를 열어야 한다.
+즉 S부터 L까지 최단경로로 한번 와야되고, 그 이후에 L부터 E까지 한번 와야한다.
+문제 설명에 E를 방문할 수 있고 다른 칸 여러번 방문할 수 있다는게 이 뜻인거 같다.
+S~L, L~E 두번의 경로를 독립적으로, 별도로 생각하라는 뜻인듯.
+
+결국 문제는 S~L까지의 bfs 1번, L~E까지의 bfs 1번이면 끝난다.
+bfs 오랜만에 해서 좀 알아보면서 짰는데, 패턴이니 적당히 외워놔야 할듯.
+
+```python
+from collections import deque
+
+
+def bfsToTag(maps, start_x, start_y, tag):
+    dir_x = [-1, 1, 0, 0]
+    dir_y = [0, 0, -1, 1]
+    
+    queue = deque([(start_x, start_y, 0)])
+    visited = [(start_x, start_y)]
+    
+    while queue:
+        x, y, dist = queue.popleft()
+        if maps[y][x] == tag:
+            return dist
+        
+        for i in range(4):
+            nx, ny = x + dir_x[i], y + dir_y[i]
+            if 0 <= nx < len(maps[0]) and 0 <= ny < len(maps):
+                if maps[ny][nx] != 'X':
+                    if (nx, ny) not in visited:
+                        queue.append((nx, ny, dist + 1))
+                        visited.append((nx, ny))
+    return -1
+
+
+def solution(maps):
+    s = (0, 0)
+    l = (0, 0)
+    for j in range(len(maps)):
+        for i in range(len(maps[0])):
+            if maps[j][i] == 'S':
+                s = (i, j)
+            if maps[j][i] == 'L':
+                l = (i, j)
+    
+    way_to_lever = bfsToTag(maps, s[0], s[1], 'L')
+    if way_to_lever > -1:
+        way_to_exit = bfsToTag(maps, l[0], l[1], 'E')
+        if way_to_exit > -1:
+            return way_to_lever + way_to_exit
+    return -1
+```
