@@ -1,0 +1,80 @@
+# 배달
+
+문제 정보 : lv2, 최단경로(다익스트라)
+
+가중치가 있는, 양방향 이동 가능한 맵에서 시작점으로부터 모든 도시의 최단거리 찾기
+1) 시작점 -> 모든 도시(one-all방식)
+2) 양의 가중치가 있다.
+는 점에서 이는 다익스트라로 해결할 수 있는 문제임을 알 수 있다.
+
+bfs로 풀려면 가중치 계산을 별도로 해줘야 하는데, 최소임을 보장할 수 있을까 싶다.
+일단 bfs로는 안되는건지 이 고민은 나중에 해보고,
+
+오랜만에 다익스트라를 봐서 아예 처음 보는 것처럼 시작했음.
+
+기본적으로 다익스트라 알고리즘에서 필요한 요소는
+1. visited: set(), 방문한 노드의 집합
+2. dist: list(), 시작점부터 i까지의 최단 거리
+
+알고리즘의 순서는
+0. 시작점(1)부터 시작, visited.add(1), dist[1] = 0
+1. 시작점으로부터 연결된 도시들의 거리를 업데이트(ex. dist[2] = 2, dist[4] = 3)
+2. 아직 방문하지 않은(visited에 체크 안된) 모든 도시들 중 최소 거리의 도시로 이동(ex. 2)
+3. 1, 2를 반복하여 모든 도시를 visited
+
+여기서 키 포인트는 아직 방문하지 않은 모든 도시 중 최소 거리의 도시로 간다는 것
+왜 이렇게 해야하며, 이게 왜 최단거리가 되냐가 알고리즘 이해의 전부일 듯
+
+절차를 보면 현재 도시로부터 연결된 도시들의 거리를 업데이트 한다.
+시작점으로부터 시작했으니, 시작점에서 연결된 도시들(예를 들어 1~5 중에서 2, 4번째 도시)의 값이 정해졌음.
+그 말은 즉슨, 값이 업데이트 안된 도시들은 시작점으로 바로 연결되지 않음 => 무조건 다른 도시를 거쳐야 함 => 2 또는 4 중에 하나를 거치게 됨 => 2 또는 4까지의 거리 +a의 거리가 나올 것
+즉, 앞으로 계산될 도시들은 2 또는 4 중 최소값보다는 항상 커질 것이다 => 2 또는 4 중 최솟값은 항상 그 값일 것이다 => 2 또는 4 중 최솟값인 친구는 최단거리가 확정이다!
+=> 즉 2 또는 4 중 최소인 친구를 그 다음으로 방문한다는 것은, 이 친구는 더 이상 작아질 일이 없다 => 즉 이번에 방문할 친구를 최소로 고르게 되면, 그 친구는 최단거리를 확정받게 된다
+=> 모든 친구들을 방문하면 => 모든 친구들의 최단거리가 확정된다!!
+
+그냥 그리디로 퉁치고 외우면 쉽겠지만, 이렇게 이해해놓으면 완벽할듯
+
+
+```python
+def get_min_city(N, dist, visited):
+    MIN = 500001
+    min_city = 0
+    for i in range(1, N + 1):
+        if i not in visited:
+            if dist[i] < MIN:
+                min_city = i
+                MIN = dist[i]
+    return min_city
+
+
+def dijkstra(N, roads_map):
+    visited = set([])
+    dist = []
+    for i in range(N + 1):
+        dist.append(500001)
+    
+    dist[1] = 0
+    curr = 1
+    visited.add(curr)
+    while len(visited) < N:
+        for (city, value) in roads_map[curr]:
+            dist[city] = min(dist[city], dist[curr] + value)
+        curr = get_min_city(N, dist, visited)
+        visited.add(curr)
+        
+    return dist
+
+    
+def solution(N, roads, K):
+    roads_map = {}
+    for i in range(1, N + 1):
+        roads_map[i] = []
+    
+    for road in roads:
+        s, e, v = road[0], road[1], road[2]
+        roads_map[s].append((e, v))
+        roads_map[e].append((s, v))
+        
+    dist = dijkstra(N, roads_map)
+    return len([d for d in dist if d <= K])
+```
