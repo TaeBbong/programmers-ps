@@ -1,0 +1,51 @@
+# 방금 그곡
+
+문제 정보 : lv2, 구현
+
+musicinfo를 바탕으로, 입력된 melody가 나오는 음악 재생을 찾는 것
+문제 자체는 어려운게 아니고 꼼꼼히 구현하면 되는데, 테스트케이스가 잘못되어 있어서 약간 애먹음
+없는 음이 테스트케이스에 있었어서...
+
+또한 먼저 입력된 음악을 뽑는다는 조건이 있는데,
+이게 먼저 재생된으로 생각했는데, 말그대로 musicinfo의 앞 순서에 있는 걸 말하는 거였음..
+
+```python
+def str_to_time(t):
+    return int(t.split(':')[0]) * 60 + int(t.split(':')[1])
+
+
+def play_melody(melody, duration):
+    return melody * (duration // len(melody)) + melody[:(duration % len(melody))]
+
+
+def replace_sharp(m):
+    m = m.replace('C#', 'H')
+    m = m.replace('D#', 'I')
+    m = m.replace('F#', 'J')
+    m = m.replace('G#', 'K')
+    m = m.replace('A#', 'L')
+    m = m.replace('B#', 'M')
+    m = m.replace('E#', 'N')
+    return m
+
+
+def solution(m, musicinfos):
+    target = {
+        'title': '',
+        'duration': 0,
+    }
+    m = replace_sharp(m)
+    
+    for music_raw in musicinfos:
+        music_parse = music_raw.split(',')
+        s, e, title, melody = str_to_time(music_parse[0]), str_to_time(music_parse[1]), music_parse[2], replace_sharp(music_parse[3])
+        play = play_melody(melody, e - s)
+        if m in play:
+            if len(target['title']):
+                if target['duration'] >= e - s:
+                    continue
+            target['title'] = title
+            target['duration'] = e - s
+            
+    return target['title'] if len(target['title']) else '(None)'
+```
