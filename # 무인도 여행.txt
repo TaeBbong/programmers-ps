@@ -1,0 +1,57 @@
+# 무인도 여행
+
+문제 정보 : lv2, flood-fill(bfs)
+
+지도 상 연결된 그룹을 만드는 문제
+플러드필, 색칠 알고리즘이다.
+옛날 기억엔 플러드필이 별개의 알고리즘이라 생각했는데, bfs/dfs로 구현되는 그런 친구였음.
+일단 이 문제는 조건이 별도로 없어서 어렵지 않게 성공
+
++ 추가로 알게 된 것은,
+dictionary는 내부적으로 key를 해싱해서 관리하므로,
+if key in dict: 이 구문은 O(1)이다.
+in에 대한 거부감 없이 그냥 쓰면 된다!
+
+```python
+from collections import deque
+
+
+def return_ltrb(point):
+    i, j = point
+    return [(i + 1, j), (i - 1, j), (i, j + 1), (i, j - 1)]
+
+
+def bfs_floodfill(points, start):
+    values = 0
+    queue = deque([start])
+    points[start][1] = True
+    values += points[start][0]
+    
+    while len(queue):
+        point = queue.popleft()
+        for next_point in return_ltrb(point):
+            if next_point in points:
+                if not points[next_point][1]:
+                    points[next_point][1] = True
+                    values += points[next_point][0]
+                    queue.append(next_point)
+    return values
+
+
+def solution(maps):
+    answer = []
+    points = {}
+    for i, row in enumerate(maps):
+        for j in range(len(row)):
+            if maps[i][j] != 'X':
+                points[(i, j)] = [int(maps[i][j]), False]
+                
+    if len(points) == 0:
+        return [-1]
+    
+    for point in points:
+        if not points[point][1]:
+            answer.append(bfs_floodfill(points, point))
+            
+    return sorted(answer)
+```
