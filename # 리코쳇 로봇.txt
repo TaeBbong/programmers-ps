@@ -1,0 +1,75 @@
+# 리코쳇 로봇
+
+문제 정보 : lv2, bfs
+
+미로 탐색하는 개념의 문제, 빨리 탈출해야함.
+문제는 한칸씩 이동하는게 아니라, 직선으로 쭉 이동할 수 있는 끝까지 가는거임
+벽을 만나거나, 장애물을 만날 때까지 한방향으로 쭉 가는거임.
+
+그래서 초반에 좀 해매다가, 결국 개념적으로는 한칸씩 가는거랑 진배없다 판단
+4방향에서 갈 수 있는 후보지는 결국 최대 4개이므로
+후보지를 찾는 함수를 따로 만들면 나머지 문제는 그냥 똑같은 bfs임
+
+이런 문제는 앞으로 최대한 빨리 풀기!(오늘은 1시간 걸림..)
+
+```python
+from collections import deque
+
+
+def find_start(board):
+    for y in range(len(board)):
+        for x in range(len(board[0])):
+            if board[y][x] == 'R':
+                return (y, x)
+    return (-1, -1)
+
+
+def find_goal(board):
+    for y in range(len(board)):
+        for x in range(len(board[0])):
+            if board[y][x] == 'G':
+                return (y, x)
+    return (-1, -1)
+
+
+def get_candidates(board, start):
+    candidates = []
+    dirs = [(1, 0), (-1, 0), (0, 1), (0, -1)]
+    y, x = start[0], start[1]
+
+    for d in dirs:
+        m, n = y + d[0], x + d[1]
+        cand = (-1, -1)
+        while 0 <= m < len(board) and 0 <= n < len(board[0]):
+            if board[m][n] == 'D':
+                cand = (m - d[0], n - d[1])
+                break
+            m, n = m + d[0], n + d[1]
+        if cand == (-1, -1):
+            cand = (m - d[0], n - d[1])
+        if cand != (y, x):
+            candidates.append(cand)
+    return candidates
+
+
+def bfs(board, start, goal):
+    queue = deque([(start, 0)])
+    visited = {}
+    while queue:
+        now, value = queue.popleft()
+        visited[now] = value
+        if now == goal:
+            return value
+        candidates = get_candidates(board, now)
+        for cand in candidates:
+            if cand not in visited:
+                queue.append((cand, value + 1))
+    return -1
+
+
+def solution(board):
+    start = find_start(board)
+    goal = find_goal(board)
+    answer = bfs(board, start, goal)
+    return answer
+```
