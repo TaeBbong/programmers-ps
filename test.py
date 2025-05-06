@@ -1,45 +1,66 @@
-def get_border(query):
-    sy, sx, ey, ex = [q - 1 for q in query]
-    border = []
-    for x in range(sx, ex + 1):
-        border.append((sy, x))
-    for y in range(sy + 1, ey + 1):
-        border.append((y, ex))
-    for x in range(ex - 1, sx - 1, -1):
-        border.append((ey, x))
-    for y in range(ey - 1, sy, -1):
-        border.append((y, sx))
-    return border
+def is_correct(w):
+    count = 0
+    for s in w:
+        if s == '(':
+            count += 1
+        else:
+            count -= 1
+        if count < 0:
+            return False
+    if count == 0:
+        return True
+    return False
 
 
-def rotate_border_with_min(border, maps):
-    i = 1
-    backup = maps[border[0][0]][border[0][1]]
-    min_value = backup
-    while i < len(border):
-        y, x = border[i]
-        temp = maps[y][x]
-        maps[y][x] = backup
-        backup = temp
-        if backup < min_value:
-            min_value = backup
-        i += 1
-    maps[border[0][0]][border[0][1]] = backup
-    return (min_value, maps)
+def reverse_brackets(w):
+    r = ''
+    for s in w:
+        if s == '(':
+            r += ')'
+        else:
+            r += '('
+    return r
 
-def solution(rows, columns, queries):
-    answer = []
-    maps = [[i * columns + j + 1 for j in range(columns)] for i in range(rows)]
 
-    for query in queries:
-        border = get_border(query)
-        min_value, maps = rotate_border_with_min(border, maps)
-        answer.append(min_value)
+def divide_brackets(w):
+    count = 0
+    for i, s in enumerate(w):
+        if s == '(':
+            count += 1
+        else:
+            count -= 1
+        if count == 0:
+            return (w[:i + 1], w[i + 1:])
+    return (w, '')
+        
+
+def correct_brackets(w):
+    # 1. Checks if `w` is empty
+    if len(w) == 0:
+        return w
+    # 2. Divides `w` into two strings `u`, `v`
+    u, v = divide_brackets(w)
+    # 3. Returns `u` + `correct_brackets(v)` if `u` is correct
+    if is_correct(u):
+        return u + correct_brackets(v)
+    # 4. Corrects `u`, and get results for `v`
+    r = '('
+    r += correct_brackets(v)
+    r += ')'
+    r += reverse_brackets(u[1:-1])
+    return r
+
+
+def solution(p):
+    answer = correct_brackets(p)
+    return answer
+
+
+def solution(p):
+    answer = correct_brackets(p)
     return answer
         
 
 
 if __name__ == "__main__":
-    print(solution(6, 6, [[2,2,5,4],[3,3,6,6],[5,1,6,3]]))
-    print(solution(3, 3, [[1,1,2,2],[1,2,2,3],[2,1,3,2],[2,2,3,3]]))
-    print(solution(100, 97, [[1,1,100,97]]))
+    print(solution("()))((()"))
