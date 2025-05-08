@@ -1,51 +1,29 @@
-def calculate_expression_by_order(expression, order):
-    stack = []
-    expression_wip = expression.copy()
-    for operator in order:
-        for exp in expression_wip:
-            if stack:
-                if stack[-1] == operator:
-                    op = stack.pop()
-                    an = stack.pop()
-                    result = str(eval(''.join([an, op, exp])))
-                    stack.append(result)
-                    continue
-            stack.append(exp)
-        expression_wip = stack.copy()
-        stack = []
-    return int(expression_wip[0])
+import sys
+limit_number = 100000
+sys.setrecursionlimit(limit_number)
 
 
-def make_orders(operators):
-    orders = []
-    from itertools import permutations
-    candidates = list(permutations(operators))
-    for cand in candidates:
-        tmp_dict = {}
-        for i, c in enumerate(cand):
-            tmp_dict[c] = i
-        orders.append(tmp_dict)
-    return orders
+def can_defense(n, k, partial_enemy):
+    return n >= sum(sorted(partial_enemy, reverse=True)[k:])
 
 
-def solution(expression_str):
-    expression = [expression_str]
-    MAX = -1
-    operators = ['-', '+', '*']
-    for oper in operators:
-        expression = [ex.replace(oper, f' {oper} ') for ex in expression]
-        tmp = []
-        for ex in expression:
-            tmp += ex.split(' ')
-        expression = tmp.copy()
-    orders = make_orders(operators)
+def binary_search(s, e, n, k, enemy):
+    if s >= e:
+        return s
     
-    for order in orders:
-        result = abs(calculate_expression_by_order(expression, order))
-        if result > MAX:
-            MAX = result
-    return MAX
+    m = (s + e) // 2
+    if can_defense(n, k, enemy[:m + 1]):
+        return binary_search(m, e, n, k, enemy)
+    else:
+        return binary_search(s, m - 1, n, k, enemy)
+    
+    
+def solution(n, k, enemy):
+    if k >= len(enemy):
+        return len(enemy)
+    
+    return binary_search(0, len(enemy) - 1, n, k, enemy) + 1
 
 
 if __name__ == "__main__":
-    print(solution("100-200*300-500+20"))
+    print(solution(7, 3, [4, 2, 4, 5, 3, 3, 1]))

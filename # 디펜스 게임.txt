@@ -1,0 +1,67 @@
+# 디펜스 게임
+
+문제 정보 : lv2, 우선순위큐, 이진탐색
+
+초반에는 dp로 접근하려 했는데, 적절하지 않았음(차근차근 고려하는 dp방식으로는 후반부를 감당할 수 없었음)
+
+아니면 k개의 무적권과 n명의 병사로 i라운드까지 막을 수 있는가를 체크?
+어차피 가능하냐 안가능하냐는 선형적으로 나오게됨
+TTTTTFFFFFFF 이런식으로
+이때 가장 마지막 T를 찾으면 되겠다!
+
+i를 이진탐색으로? (0, 6)
+1. i = 3 => 4,2,4,5 => 가능
+2. i = 4 => 4,2,4,5,3 => 가능
+4, 6 => 5
+3. i = 5 => 4,2,4,5,3,3 => 불가능
+4, 4 => ret 4
+
+s, m - 1 / m + 1, e
+종료 조건 : s > e => ret e
+
+```python
+import sys
+limit_number = 100000
+sys.setrecursionlimit(limit_number)
+
+
+def can_defense(n, k, partial_enemy):
+    return n >= sum(sorted(partial_enemy, reverse=True)[k:])
+
+
+def binary_search(s, e, n, k, enemy):
+    if s > e:
+        return e
+    
+    m = (s + e) // 2
+    if can_defense(n, k, enemy[:m + 1]):
+        return binary_search(m + 1, e, n, k, enemy)
+    else:
+        return binary_search(s, m - 1, n, k, enemy)
+    
+    
+def solution(n, k, enemy):
+    if k >= len(enemy):
+        return len(enemy)
+    
+    return binary_search(0, len(enemy) - 1, n, k, enemy) + 1
+```
+
+나는 이렇게 해서 맞긴 했는데, 우선순위큐 방식이 정답인 듯 함
+
+라운드를 하나 지나갈 때마다 해당 라운드 값을 우선순위큐에 넣기(내림차순 정렬된 상태로 보관)
+그러다가 n을 넘어가게되면 => 이전까지 있었던 라운드 중에서 제일 큰 값을 무적권 써서 방어, 큰 값만큼 병사 수를 복원
+
+확실히 우선순위큐에 대한 감이나 경험, 아이디어가 부족한듯
+
+```python
+import heapq as hq
+def solution(n, k, enemy):
+    q = enemy[:k]
+    hq.heapify(q)
+    for idx in range(k,len(enemy)):
+        n -= hq.heappushpop(q,enemy[idx])
+        if n < 0:
+            return idx
+    return len(enemy)
+```
