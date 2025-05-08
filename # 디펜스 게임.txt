@@ -55,13 +55,19 @@ def solution(n, k, enemy):
 확실히 우선순위큐에 대한 감이나 경험, 아이디어가 부족한듯
 
 ```python
-import heapq as hq
 def solution(n, k, enemy):
-    q = enemy[:k]
-    hq.heapify(q)
-    for idx in range(k,len(enemy)):
-        n -= hq.heappushpop(q,enemy[idx])
-        if n < 0:
-            return idx
-    return len(enemy)
+    from heapq import heappushpop, heappush
+    heap = []
+    total = _round = 0
+    for each in enemy:
+        total += each
+        if total <= n:
+            heappush(heap, -each)
+            _round += 1
+        else:
+            if k > 0:
+                k -= 1
+                total += heappushpop(heap, -each)
+                _round += 1
+    return _round
 ```
