@@ -1,0 +1,38 @@
+# 유연근무제
+
+문제 정보 : lv1, 구현
+
+걍 간단한 문제인데, 시간 표현법이 달라서 그것만 잘 하면 됨
+
+```python
+def days_except_weekends(startday):
+    days = []
+    for i in range(startday, startday + 7):
+        if i % 7 != 6 and i % 7 != 0:
+            days.append(i - startday)
+    return days
+
+
+def is_late(user_time, schedule_time):
+    hours = schedule_time // 100
+    minutes = (schedule_time % 100 + 10)
+    extra_hours = minutes // 60
+    allow_time = (hours + extra_hours) * 100 + minutes % 60
+    
+    return allow_time < user_time
+
+
+def solution(schedules, timelogs, startday):
+    answer = 0
+    days = days_except_weekends(startday)
+    for i, schedule in enumerate(schedules):
+        timelog = timelogs[i]
+        has_late = False
+        for day in days:
+            if is_late(timelog[day], schedule):
+                has_late = True
+                break
+        if not has_late:
+            answer += 1
+    return answer
+```
