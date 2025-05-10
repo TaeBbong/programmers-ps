@@ -1,0 +1,56 @@
+# 가장 큰 정사각형 찾기
+
+문제 정보 : lv2, 구현?
+
+최대 1000x1000 map에서 1로 구성된 가장 큰 정사각형 찾기
+입력 map은 직사각형
+
+시작점과 끝점이 주어졌을 때 그 안이 정사각형임을 확인하는 로직 => O(n^2)
+이 짓을 모든 지점마다 한다? => O(n^4)... 해결 X
+
+dp를 적용해야겠지??
+
+dp[y][x] = (y, x)를 우측하단 모서리로 했을 때, 만들 수 있는 최대 정사각형의 크기
+dp[y][x] = min(dp[y - 1][x], dp[y][x - 1], dp[y - 1][x - 1]) + 1
+근데 디테일하게 갈거면, (y, x)가 1일 때에만 이 조건을 따져줘야 함
+
+다 맞았는데 왜 하나 틀릴까 싶어서 알아보니, dp의 최댓값을 따로 구한게 아니라 1,1부터 시작해서 max 갱신으로 하고 있기 때문에 그런거..
+가장자리 쪽에만 1이 있는 경우에는 해당 값이 갱신이 안됨..
+결국 dp를 따로 탐색해서 max를 찾아주던가,
+아니면 가장자리쪽을 따로 돌려주는 방법이 있을 듯
+
+```python
+def initialize_dp(board):
+    height = len(board) 
+    width = len(board[0])
+    dp = [[0] * width for _ in range(height)]
+    for y in range(height):
+        for x in range(width):
+            dp[y][x] = board[y][x]
+    return dp
+
+
+def solution(board):
+    height = len(board)
+    width = len(board[0])
+    dp = initialize_dp(board)
+    MAX = -1
+    
+    height_side = [b[0] for b in board]
+    width_side = board[0]
+    
+    if sum(height_side) != 0 or sum(width_side) != 0:
+        MAX = 1
+    
+    for y in range(1, height):
+        for x in range(1, width):
+            if board[y][x] == 1:
+                dp[y][x] += min(dp[y - 1][x - 1], dp[y - 1][x], dp[y][x - 1])
+            if MAX < dp[y][x]:
+                MAX = dp[y][x]
+                
+    if MAX == -1:
+        return 0
+    
+    return MAX * MAX
+```
