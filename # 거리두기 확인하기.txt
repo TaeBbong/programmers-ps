@@ -1,0 +1,60 @@
+# 거리두기 확인하기
+
+문제 정보 : lv2, 구현
+
+모든 수험생 간 거리가 2 초과여야 하고, 2이하인데 그 사이에 파티션이 있다면 괜찮음
+2이하의 경우를 살펴보면
+0 => 한 자리에 두명 앉아있어야 하니 이런 경우는 없음
+1 => 바로 인접해서 앉아야 함 => 무조건 False
+2 => 일직선으로 앉는 경우 : P O P 또는 P/O/P 이렇게 앉아야 함 => 한 줄에 있어야 거리 1이 나오며, 그 사이 O가 파티션인지만 체크
+2 => 대각선 방향으로 앉는 경우 : a의 y좌표 + b의 x좌표, b의 y좌표 + a의 x좌표 이렇게 두 자리를 체크하면 됨
+따라서 추가적인 반복문 없이, 위 조건들만 따져주면 될 듯
+
+아마 이럴 때 나중에는 거리가 n인 것까지 허용하면 어떻게 짤거냐는 식으로 면접이 나올 수 있을 텐데..
+그 때는 a, b 좌표 사이의 모든 자리를 뽑는 반복문을 짜면 끝날 듯
+
+```python
+def calc_dist(p_a, p_b):
+    return abs(p_a[0] - p_b[0]) + abs(p_a[1] - p_b[1])
+
+
+def check_partition(p_a, p_b, place):
+    if p_a[0] == p_b[0]:
+        space = p_a[1] + 1 if p_a[1] < p_b[1] else p_b[1] + 1
+        return True if place[p_a[0]][space] == 'X' else False
+    if p_a[1] == p_b[1]:
+        space = p_a[0] + 1 if p_a[0] < p_b[0] else p_b[0] + 1
+        return True if place[space][p_a[1]] == 'X' else False
+    space_1 = (p_a[0], p_b[1])
+    space_2 = (p_b[0], p_a[1])
+    if place[space_1[0]][space_1[1]] != 'X':
+        return False
+    if place[space_2[0]][space_2[1]] != 'X':
+        return False
+    return True
+    
+
+def check_place(place):
+    people = []
+    for y in range(5):
+        for x in range(5):
+            if place[y][x] == 'P':
+                people.append((y, x))
+    for p_a in people:
+        for p_b in people:
+            if calc_dist(p_a, p_b) == 0:
+                continue
+            if calc_dist(p_a, p_b) == 1:
+                return 0
+            if calc_dist(p_a, p_b) == 2:
+                result = check_partition(p_a, p_b, place)
+                if not result:
+                    return 0
+    return 1
+
+def solution(places):
+    answer = []
+    for place in places:
+        answer.append(check_place(place))
+    return answer
+```
