@@ -1,0 +1,26 @@
+# 하노이의 탑
+
+문제 정보 : lv2, 재귀, 백트래킹
+
+아주 클래식한 재귀 문제로 유명한 하노이의 탑
+
+hanoi(n, s, e, m) => n개의 원판을 s에서 m을 거쳐 e로 옮기는 방법
+hanoi(n, s, e, m) = hanoi(n - 1, s, m, e) + hanoi(1, s, e, m) + hanoi(n - 1, m, e, s)
+
+```python
+def hanoi(n, s, e, m):
+    result = []
+    if n == 1:
+        # print(f'{s} => {e}')
+        return [[s, e]]
+    result += hanoi(n - 1, s, m, e)
+    result += hanoi(1, s, e, m)
+    result += hanoi(n - 1, m, e, s)
+    return result
+
+
+def solution(n):
+    answer = [[]]
+    answer = hanoi(n, 1, 3, 2)
+    return answer
+```
