@@ -1,0 +1,46 @@
+# 우박수열 정적분
+
+문제 정보 : lv2, 구현
+
+수열을 구하고, 수열 간 넓이를 구하고, 입력에 맞게 덧셈하면 되는 문제
+입력으로 주어진 구간(s, e)에 대해 s > e인 경우 음수의 넓이를 제공하면 될 줄 알았는데,
+문제 조건에 -1로 퉁치라고 되어있음ㅎ...
+이것 때문에 쫌 걸렸음
+
+```python
+def get_collatz(k):
+    collatz = [k]
+    while k != 1:
+        if k % 2 == 0:
+            k //= 2
+        else:
+            k = k * 3 + 1
+        collatz.append(k)
+    return collatz
+
+
+def get_extents(collatz):
+    extents = []
+    for i, c in enumerate(collatz[:-1]):
+        extents.append((c + collatz[i + 1]) / 2)
+    return extents
+
+
+def get_result_by_range(extents, n, r):
+    s, e = r[0], n + r[1] - 1
+    if s > e:
+        return -1
+    result = 0
+    for i in range(s, e):
+        result += extents[i]
+    return result
+
+    
+def solution(k, ranges):
+    answer = []
+    collatz = get_collatz(k)
+    extents = get_extents(collatz)
+    for r in ranges:
+        answer.append(get_result_by_range(extents, len(collatz), r))
+    return answer
+```
