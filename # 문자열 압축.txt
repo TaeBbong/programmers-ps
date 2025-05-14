@@ -1,0 +1,108 @@
+# 문자열 압축
+
+문제 정보 : lv2
+
+aabbaccc
+unit : 1 => 2a2ba3c
+unit : 2 => 1aa1bba1ccc 애초에 계수로 1은 올 수 없다..
+
+ababcdcdababcdcd
+unit : 1 => ababcdcdababcdcd
+unit : 2 => 2ab2cd2ab2cd
+unit : 3 => ababcdcdababcdcd
+
+a bab cdc
+
+새로운 값이 들어올 때마다, stack[top-3:top], stack[top-6:top-3]
+즉, stack[top-unit:top], stack[top-2unit:top-unit]이 같은지 비교
+같으면, top = top - 2unit으로 전부 pop하고, 
+그 앞에 정수가 있으면 pop, + 1 해서 push, stack[top-unit:top] 부분을 push
+정수가 없으면 2 push, stack[top-unit:top] 부분을 push
+
+ababcdcdababcdcd 이걸 위 알고리즘대로 계산하면,
+
+a
+ab
+aba
+2ab
+2abc
+2abcd
+2abcdc
+2ab2cd
+대충 이런 느낌!!
+
+결국 unit을 1~len(s)//2 정도로 반복하고,
+모든 단위 unit에 대해 이 짓을 반복하면 될듯!
+
+```python
+def zip_string_with_unit(s, unit):
+    stack = []
+    for i in range(0, 2 * unit - 1):
+        stack.append(s[i])
+    for i in range(2 * unit - 1, len(s)):
+        stack.append(s[i])
+        top = len(stack)
+        if stack[top-unit:top] == stack[top-2*unit:top-unit]:
+            tmp = stack[top-unit:top]
+            stack = stack[:top-2*unit]
+            if len(stack):
+                if str(stack[-1]).isdigit():
+                    stack[-1] += 1
+                else:
+                    stack.append(2)
+            else:
+                stack.append(2)
+            stack += tmp
+    return stack
+                
+
+
+def solution(s):
+    MIN = len(s)
+    for unit in range(1, len(s) // 2 + 1):
+        zipped = zip_string_with_unit(s, unit)
+        if len(zipped) < MIN:
+            MIN = len(zipped)
+    return MIN
+```
+
+이렇게 풀면 효율 좋게 압축 가능
+근데 문제 조건은 맨 앞에서부터 같은 단위로 나누라고 나와있네..
+이러면 사실 그냥 앞에서부터 똑같은 단위로 나눠놓고,
+연속되게 같은거 갯수만 세서 하면 될듯..
+뭔가 내가 푼 방식이 더 적합한거 아닌가 싶긴 한데..
+
+사실 결국 풀이는 비슷함 stack 활용
+비교하는 단위를 문자열 하나씩이 아닌, split된 상태의 리스트로 비교하면 됨
+
+```python
+def zip_string_with_unit(s, unit):
+    stack = []
+    for i in range(0, 2 * unit - 1):
+        stack.append(s[i])
+    for i in range(2 * unit - 1, len(s)):
+        stack.append(s[i])
+        top = len(stack)
+        if stack[top-unit:top] == stack[top-2*unit:top-unit]:
+            tmp = stack[top-unit:top]
+            stack = stack[:top-2*unit]
+            if len(stack):
+                if str(stack[-1]).isdigit():
+                    stack[-1] += 1
+                else:
+                    stack.append(2)
+            else:
+                stack.append(2)
+            stack += tmp
+    return stack
+                
+
+
+def solution(s):
+    MIN = len(s)
+    for unit in range(1, len(s) // 2 + 1):
+        zipped = zip_string_with_unit(s, unit)
+        if len(zipped) < MIN:
+            MIN = len(zipped)
+    return MIN
+```
