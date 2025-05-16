@@ -1,0 +1,37 @@
+# 퍼즐 게임 챌린지
+
+문제 정보 : lv2, 이진탐색
+
+전형적인 이진탐색 문제로, 찾고자 하는 값에 따라 계산되는 결과값이 선형적이므로(FFFFFFTTTTTTTTT)
+이진탐색으로 해결 가능! 금방 풀었다ㅎㅎ
+
+```python
+def check_available(level, diffs, times, limit):
+    total_time = 0
+    time_prev = 0
+    for i, diff in enumerate(diffs):
+        time = times[i]
+        if diff <= level:
+            total_time += time
+        else:
+            total_time += (time + time_prev) * (diff - level) + time
+        time_prev = time
+    return total_time <= limit
+
+
+def binary(s, e, diffs, times, limit):
+    level = (s + e) // 2
+    if s > e:
+        return s
+    if check_available(level, diffs, times, limit):
+        return binary(s, level - 1, diffs, times, limit)
+    else:
+        return binary(level + 1, e, diffs, times, limit)
+
+
+def solution(diffs, times, limit):
+    MIN_DIFF = 1
+    MAX_DIFF = max(diffs)
+    answer = binary(MIN_DIFF, MAX_DIFF, diffs, times, limit)
+    return answer
+```
