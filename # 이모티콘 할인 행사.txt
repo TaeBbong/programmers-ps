@@ -1,3 +1,13 @@
+# 이모티콘 할인 행사
+
+문제 정보 : lv2, 구현
+
+그냥 요구 조건에 맞게 잘 구현하면 됨
+꼼꼼하게..
+itertools에 product가 있는데 쓸만한 친구인듯
+k개의 원소들로 n개 짜리 리스트를 만드려고 할 때 사용
+
+```python
 from itertools import product
 
 
@@ -39,7 +49,4 @@ def solution(users, emoticons):
             if result[1] > answer[1]:
                 answer = [result[0], result[1]]
     return answer
-
-
-if __name__ == "__main__":
-    print(solution([[40, 10000], [25, 10000]], [7000, 9000]))
+```
