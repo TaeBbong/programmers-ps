@@ -1,0 +1,30 @@
+# 점 찍기
+
+문제 정보 : lv2, 구현
+
+k는 단위, d는 최대 거리
+(0,0) -> (x, y)의 거리가 d를 넘지 않는 모든 정수 점들 구하기
+
+for x in range(0, d, k):
+    for y in range(0, d, k):
+        if dist(x, y) > d:
+            break
+
+이렇게 하면 안되려나? => 시간초과 남
+y의 범위를 x 기준으로 계산해도 => 시간초과 남
+결국 반복은 x로만 하고, y의 최대값을 계산한 다음, 해당 y 값을 k로 나눈 몫을 계산하면 x 기준 찍어야 하는 y 개수가 나옴!
+
+```python
+import math
+
+
+def get_max_y(x, d):
+    return math.floor((d ** 2 - x ** 2) ** 0.5)
+
+
+def solution(k, d):
+    answer = 0
+    for x in range(0, d + 1, k):
+        answer += get_max_y(x, d) // k + 1
+    return answer
+```
