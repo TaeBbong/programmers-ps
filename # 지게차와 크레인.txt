@@ -1,3 +1,12 @@
+# 지게차와 크레인
+
+문제 정보 : lv2, bfs
+
+bfs 귀찮아서 날먹하려다가 실패
+정사영 시키는 방법으로 풀다가 안쪽으로 탐색 가능한 케이스가 있어서, 결국 bfs를 적용해야 했음
+그래도 어렵진 않음
+
+```python
 from collections import deque
 
 
@@ -29,6 +38,7 @@ def jigecar(storage, request):
                         queue.append(nex)
         else:
             continue
+            
     for container in list(containers):
         storage[container[0]][container[1]] = ' '
     return storage, len(containers)
@@ -55,7 +65,4 @@ def solution(storage, requests):
             storage, removed = crain(storage, request)
             answer -= removed
     return answer
-
-
-if __name__ == "__main__":
-    print(solution(["AZWQY", "CAABX", "BBDDA", "ACACA"], ["A", "BB", "A"]))
+```
