@@ -1,0 +1,46 @@
+# 과제 진행하기
+
+문제 정보 : lv2, 구현, 스택
+
+1번 과제부터 진행,
+해당 과제 끝나기 전에 새로운 과제 할 시간 되면 새로운 과제 시작
+과제 끝났는데 다음 과제까지 시간 남으면 기존에 하던 과제 다시 시작
+기존 과제 중에 가장 최근에 멈춘 과제부터 시작
+
+```python
+def clock_to_minutes(start):
+    hours, minutes = [int(s) for s in start.split(':')]
+    return hours * 60 + minutes
+    
+
+def solution(plans):
+    answer = []
+    stack = []
+    plans = [[plan[0], clock_to_minutes(plan[1]), int(plan[2])] for plan in plans]
+    plans = sorted(plans, key=lambda x: x[1])
+    
+    idx = 0
+    cur = plans[idx]
+    idx += 1
+    while idx < len(plans):
+        nex = plans[idx]
+        if cur[1] + cur[2] > nex[1]:
+            pause = [cur[0], cur[1], cur[2] - nex[1] + cur[1]]
+            stack.append(pause)
+            cur = nex
+            idx += 1
+        else:
+            answer.append(cur[0])
+            now = cur[1] + cur[2]
+            if len(stack):
+                cur = [stack[-1][0], now, stack[-1][2]]
+                stack = stack[:-1]
+            else:
+                cur = nex
+                idx += 1
+    answer.append(cur[0])
+    if len(stack):
+        for i in range(len(stack) - 1, -1, -1):
+            answer.append(stack[i][0])
+    return answer
+```
