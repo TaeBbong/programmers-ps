@@ -1,0 +1,47 @@
+# 두 원 사이의 정수 쌍
+
+문제 정보 : lv2, 수학
+
+'''
+Can calculate `y` with given `x`.
+    y ^ 2 + x ^ 2 = r ^ 2
+    y ^ 2 = r ^ 2 - x ^ 2
+    y = (r ** 2 - x ** 2) ** 0.5
+    
+    y1 = (r1 ** 2 - x ** 2) ** 0.5
+    y2 = (r2 ** 2 - x ** 2) ** 0.5
+    for x in range(0 ~ r2):
+        y1.ceil ~ y2.floor
+'''
+import math
+
+
+def solution(r1, r2):
+    answer = 0
+    r1, r2 = min(r1, r2), max(r1, r2)
+    
+    counts = 0
+    for x in range(1, r2):
+        y1 = (r1 ** 2 - x ** 2)
+        
+        if y1 < 0:
+            y1 = 0.0
+        else:
+            y1 = y1 ** 0.5
+            
+        y2 = (r2 ** 2 - x ** 2) ** 0.5
+        
+        if y1.is_integer():
+            pass
+        else:
+            y1 = math.ceil(y1)
+            
+        if y2.is_integer():
+            pass
+        else:
+            y2 = math.floor(y2)
+            
+        counts += (y2 - y1 + 1)
+        
+    counts += 1 # (r2, 0)
+    return counts * 4
