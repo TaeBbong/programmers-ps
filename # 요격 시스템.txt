@@ -1,0 +1,19 @@
+# 요격 시스템
+
+문제 정보 : lv2, 구현
+
+왜 e좌표만으로 정렬해도 괜찮은걸까??
+
+```python
+def solution(targets):
+    answer = 1
+    targets = sorted(targets, key=lambda x: x[1])
+    end = targets[0][1]
+    for target in targets[1:]:
+        if target[0] < end:
+            continue
+        else:
+            end = target[1]
+            answer += 1
+    return answer
+```
