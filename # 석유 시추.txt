@@ -1,0 +1,58 @@
+# 석유 시추
+
+문제 정보 : lv2, bfs/dfs, 그룹화
+
+연결된 모든 그룹을 만들면 대충 해결되는 문제
+bfs/dfs 뭐든 상관 없으며, 시간복잡도를 위해 visited를 따로 구현하면 안되었던 문제
+visited 대신 land[i][j]의 value를 변경하는 걸로 구현
+오랜만에 bfs를 응용한 그룹화 문제 푸니까 헷갈렸음
+
+```python
+from collections import deque
+
+
+def group_with_bfs(land, start, value):
+    counts = 1
+    dirs = [(0, 1), (0, -1), (1, 0), (-1, 0)]
+
+    queue = deque([start])
+    land[start[0]][start[1]] = value
+    
+    while queue:
+        x, y = queue.popleft()
+        for dx, dy in dirs:
+            if 0 <= x + dx < len(land) and 0 <= y + dy < len(land[0]):
+                if land[x + dx][y + dy] == 1:
+                    queue.append((x + dx, y + dy))
+                    land[x + dx][y + dy] = value
+                    counts += 1
+    
+    return land, counts
+                    
+
+def solution(land):
+    answer = 0
+    value = 2
+    
+    amounts_dict = {}
+    
+    for i in range(len(land)):
+        for j in range(len(land[i])):
+            if land[i][j] == 1:
+                land, amounts = group_with_bfs(land, (i, j), value)
+                amounts_dict[value] = amounts
+                value += 1
+    
+    for j in range(len(land[0])):
+        pump = set([])
+        ans = 0
+        for i in range(len(land)):
+            if land[i][j]:
+                pump.add(land[i][j])
+        for g in pump:
+            ans += amounts_dict[g]
+        if ans > answer:
+            answer = ans
+            
+    return answer
+```
