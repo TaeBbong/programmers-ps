@@ -1,0 +1,28 @@
+# 혼자 놀기의 달인
+
+문제 정보 : lv2, 탐색? 사이클 찾기?
+
+사이클을 찾는 문제로, 이동할 수 있는 후보지가 하나씩 뿐이므로, dfs라기보단 그냥 단순 탐색에 가깝긴 함
+
+```python
+def solution(cards):
+    cards = [c - 1 for c in cards]
+    
+    visited = [False] * len(cards)
+    scores = []
+    for card in cards:
+        if not visited[card]:
+            curr = card
+            cnt = 0
+            while not visited[curr]:
+                visited[curr] = True
+                curr = cards[curr]
+                cnt += 1
+            scores.append(cnt)
+            
+    if len(scores) == 1:
+        return 0
+    else:
+        scores = sorted(scores, reverse=True)
+        return scores[0] * scores[1]
+```
