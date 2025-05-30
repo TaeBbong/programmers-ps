@@ -1,0 +1,23 @@
+# 비밀 코드 해독
+
+문제 정보 : lv2, set 연산
+
+n제한이 적어서 되겠다 싶었는데 그냥 됨..
+생각보다 머리 아플 수 있었는데 ㄲㅂ
+
+```python
+from itertools import combinations
+
+
+def solution(n, queries, ans):
+    candidates = combinations([i + 1 for i in range(n)], 5)
+    answers = []
+    for cand in candidates:
+        flag = True
+        for i, q in enumerate(queries):
+            if len(set(cand) & set(q)) != ans[i]:
+                flag = False
+        if flag:
+            answers.append(cand)
+    return len(answers)
+```
