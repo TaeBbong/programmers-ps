@@ -1,0 +1,34 @@
+# 숫자 블록
+
+문제 정보 : lv2, 머리싸움
+
+로직은 완벽했으나, 반복을 돌리는 N 값 설정에서 오류가 있었음.
+나는 MAX_NUM = 10000000 if n > 10000000 else n - 1
+이렇게 설정해놓고, 반복은 MAX_NUM ** 0.5로 구현했음
+근데 이러면 결국 n이 커지든 말든 무조건 최대 10000000 ** 0.5 == 3163 만큼만 반복을 하게 됨
+다른 일반적인 케이스는 문제 없으나, 3163보다 큰 소수로 나눠지는 케이스가 있음
+이를테면 4001 * 10007 값의 경우가 그럼
+이런 경우에는 당연히 n ** 0.5 == 6328 만큼 돌렸으면 충분히 찾을 수 있는 케이스임
+약간 아쉽네요...
+
+def get_maximum_divider(n):
+    if n == 1:
+        return 0
+    
+    MAX_NUM = 10000000 if n > 10000000 else n - 1
+    curr_max = 1
+    
+    for i in range(2, int((n + 1) ** 0.5) + 1):
+        if n % i == 0:
+            if n // i <= MAX_NUM:
+                return n // i
+            else:
+                curr_max = i
+    return curr_max
+
+
+def solution(begin, end):
+    answer = []
+    for n in range(begin, end + 1):
+        answer.append(get_maximum_divider(n))
+    return answer
