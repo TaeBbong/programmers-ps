@@ -1,0 +1,35 @@
+# 조이스틱
+
+문제 정보 : lv2, 그리디
+
+위아래는 쉬운데 좌우 이동이 머리 아픔
+gpt 행님한테 물어보니 되게 심플하게 답변을 만들어줌
+이걸 기반으로 이해를 해보면,
+
+어차피 왔다 갔다가 여러번이면 무조건 손해. 돌아오는건 1번이면 족함
+그럼 모든 i에 대해서
+1) 처음부터 i만큼 정상주행 했다가, 다시 i만큼 백하고, 뒤에서부터 나머지 이동하는 방법
+2) 처음부터 뒤에서 시작해서 나머지 이동하고, 나머지만큼 백하고, 처음부터 i만큼 이동하는 방법
+
+즉 모든 위치에 대해 min 비교를 하게 되는 것..
+아직도 제대로 이해는 못한듯
+
+def solution(name: str) -> int:
+    n = len(name)
+    vertical = sum(min(ord(c) - ord('A'), 26 - (ord(c) - ord('A'))) for c in name)
+
+    move = n - 1
+    for i in range(n):
+        j = i + 1
+        while j < n and name[j] == 'A':
+            j += 1
+        # 구간 길이 k = j - (i+1), 오른쪽 끝까지 남은 길이 rest
+        rest = n - j
+        # ① 오른쪽 i칸 → 왼쪽 i칸 되돌아가서 ↺ → 오른쪽으로 rest
+        option1 = i * 2 + rest
+        # ② 왼쪽(끝)에서 rest칸 먼저 가서 ↺ → 오른쪽 i칸
+        option2 = rest * 2 + i
+
+        move = min(move, option1, option2)
+
+    return vertical + move
