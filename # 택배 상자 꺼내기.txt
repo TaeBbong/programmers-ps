@@ -1,0 +1,26 @@
+# 택배 상자 꺼내기
+
+문제 정보 : lv1, 구현
+
+더 좋은 방법이 있는 듯 하다..
+
+def solution(n, w, num):
+    answer = 0
+    
+    n -= 1
+    num -= 1
+    share_n, remain_n = n // w, n % w
+    share_num, remain_num = num // w, num % w
+    
+    answer += (share_n - share_num)
+    if (share_n & 1) == (share_num & 1):
+        if remain_n >= remain_num:
+            answer += 1
+    else:
+        if share_n & 1:
+            if w - remain_n - 1 <= remain_num:
+                answer += 1
+        else:
+            if remain_n >= w - remain_num - 1:
+                answer += 1
+    return answer
