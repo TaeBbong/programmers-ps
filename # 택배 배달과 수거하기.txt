@@ -1,0 +1,80 @@
+# 택배 배달과 수거하기
+
+문제 정보 : lv2, 그리디
+
+맨 뒤에서부터 배달/수거를 진행
+배달과 수거를 각각 진행하면서 로그를 쌓아놓고,
+해당 라운드에 배달/수거 거리의 max 값으로 계산하면 해결
+
+```python
+def next_target(end, cap, targets):
+    for i in range(end, -1, -1): 
+        if targets[i] != 0:
+            end = i
+            break
+    box = 0
+    start = -1
+    for i in range(end, -1, -1):
+        if cap >= box + targets[i]:
+            box += targets[i]
+            targets[i] = 0
+        else:
+            targets[i] -= (cap - box)
+            box = cap
+            start = i
+            break
+    if start == -1:
+        start = 0
+    return end, start, targets, box
+
+
+def solution(cap, n, deliveries, pickups):
+    log_delivery = []
+    log_pickup = []
+
+    end, start = n - 1, -1
+    total = sum(deliveries)
+    while total:
+        end, start, deliveries, box = next_target(end, cap, deliveries)
+        log_delivery.append(end)
+        total -= box
+        end = start
+
+    end, start = n - 1, -1
+    total = sum(pickups)
+    while total:
+        end, start, pickups, box = next_target(end, cap, pickups)
+        log_pickup.append(end)
+        total -= box
+        end = start
+    
+    jobs_delivery = len(log_delivery)
+    jobs_pickup = len(log_pickup)
+    if jobs_delivery > jobs_pickup:
+        for i in range(jobs_pickup, jobs_delivery):
+            log_pickup.append(0)
+    else:
+        for i in range(jobs_delivery, jobs_pickup):
+            log_delivery.append(0)
+    
+    answer = 0
+    for i in range(len(log_delivery)):
+        answer += max(log_delivery[i], log_pickup[i]) + 1
+    return answer * 2
+```
+
++ 훨씬 간결하고 좋은 방법인 gpt 방식 그리디
+
+```python
+def solution(cap, n, deliveries, pickups):
+    answer = 0
+    d = p = 0
+    for i in range(n - 1, -1, -1):
+        d += deliveries[i]
+        p += pickups[i]
+        while d > 0 or p > 0:
+            d -= cap
+            p -= cap
+            answer += (i + 1) * 2
+    return answer
+```
