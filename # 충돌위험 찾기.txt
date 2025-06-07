@@ -1,0 +1,68 @@
+# 충돌위험 찾기
+
+문제 정보 : lv2, 시뮬레이션
+
+문제를 쪼개서 풀면 간단하게 구현 가능
+나는 일단 풀 때 아주아주 정직하게 문제 요구사항/상황을 그대로 옮겨서 풀었음
+
+```python
+def connect_points(s, e):
+    route = []
+    
+    c = s[1]
+    r_range = range(s[0], e[0] + 1) if s[0] < e[0] else range(s[0], e[0] - 1, -1)
+    for r in r_range:
+        route.append((r, c))
+
+    r = e[0]
+    c_range = range(s[1] + 1, e[1] + 1) if s[1] < e[1] else range(s[1] - 1, e[1] - 1, -1)
+    for c in c_range:
+        route.append((r, c))
+    
+    return route
+
+
+def make_robot_route(route_point):
+    total_route = []
+    for i, s in enumerate(route_point[:-1]):
+        for e in [route_point[i + 1]]:
+            if len(total_route):
+                total_route += connect_points(s, e)[1:]
+            else:
+                total_route += connect_points(s, e)
+    return total_route
+
+
+def solution(points, routes):
+    answer = 0
+    
+    robot_routes = []
+    for route in routes:
+        route_point = [points[r - 1] for r in route]
+        robot_route = make_robot_route(route_point)
+        robot_routes.append(robot_route)
+    
+    t = 0
+    while True:
+        curr_positions = {}
+        collisions = 0
+        
+        for i, robot in enumerate(robot_routes):
+            if t < len(robot):
+                if robot[t] in curr_positions:
+                    curr_positions[robot[t]].append(i)
+                else:
+                    curr_positions[robot[t]] = [i]
+        
+        if len(curr_positions.keys()) == 0:
+            break
+        
+        for pos, robots in curr_positions.items():
+            if len(robots) > 1:
+                collisions += 1
+                
+        t += 1
+        answer += collisions
+        
+    return answer
+```
