@@ -1,3 +1,12 @@
+# 완전범죄
+
+문제 정보 : lv2, dp/그리디??
+
+dp[i][k] = i번째 물건까지 훔쳐서 B가 k만큼 흔적을 남겼을 때 A가 남긴 흔적의 최솟값
+dp[i][k] = 1) B가 i번째 물건을 훔쳤을 때, 2) B가 안훔쳤을 때
+dp[i][k] = min(dp[i - 1][k - info[i][1]], dp[i - 1][k] + info[i][0])
+
+```python
 def solution(info, n, m):
     '''
     dp[i][k] = min(dp[i - 1][k - info[i][1]], dp[i - 1][k] + info[i][0])
@@ -24,10 +33,4 @@ def solution(info, n, m):
     if answer >= n:
         return -1
     return answer
-
-
-if __name__ == "__main__":
-    solution([[1, 2], [2, 3], [2, 1]]	, 4, 4)
-    solution([[1, 2], [2, 3], [2, 1]]	, 1, 7)
-    solution([[3, 3], [3, 3]]	, 7, 1)
-    solution([[3, 3], [3, 3]]	, 6, 1)
+```
