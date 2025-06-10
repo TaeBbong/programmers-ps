@@ -1,0 +1,82 @@
+# 아날로그 시계
+
+문제 정보 : lv2, 구현
+
+1초마다 위치(각도)를 갱신하면서 역전했는지 탐지
+역전 조건은
+1) 이전에는 시침/분침이 더 멀리 있었는데 지금은 초침이 더 멀리 있을 때
+2) 이전에는 시침/분침이 더 멀리 있었는데 초침이 한바퀴를 더 돌아버렸을 때
+
+나머지 연산 때문에 초침이 0이 되어버리면 역전 케이스로 탐지가 어려웠는데, 이를 바퀴수로 해결
+
+```python
+def solution(h1, m1, s1, h2, m2, s2):
+    start_seconds = h1 * 3600 + m1 * 60 + s1
+    end_seconds = h2 * 3600 + m2 * 60 + s2
+    
+    lap_hour, pos_hour = 0, start_seconds % (360 * 120)
+    lap_minute, pos_minute = 0, start_seconds * 12 % (360 * 120)
+    lap_second, pos_second = 0, start_seconds * 6 * 120 % (360 * 120)
+    
+    meet_count = 1 if pos_hour == pos_second or pos_minute == pos_second else 0
+    
+    prev_hour = (lap_hour, pos_hour)
+    prev_minute = (lap_minute, pos_minute)
+    prev_second = (lap_second, pos_second)
+    
+    for t in range(end_seconds - start_seconds):
+        meet_hour, meet_minute = False, False
+        pos_hour += 1
+        pos_minute += 12
+        pos_second += 720
+        
+        if pos_hour >= 360 * 120:
+            lap_hour += 1
+            pos_hour = pos_hour % (360 * 120)
+        if pos_minute >= 360 * 120:
+            lap_minute += 1
+            pos_minute = pos_minute % (360 * 120) # 0
+        if pos_second >= 360 * 120:
+            lap_second += 1
+            pos_second = pos_second % (360 * 120) # 0
+        # print(f'({lap_hour}, {pos_hour}), ({lap_minute}, {pos_minute}), ({lap_second}, {pos_second})')
+        
+        if prev_hour[0] - prev_second[0] == lap_hour - lap_second:
+            if prev_hour[1] > prev_second[1] and pos_hour <= pos_second:
+                meet_hour = True
+                # print(f'[+] hour-second at {t}')
+        else:
+            if prev_hour[1] > prev_second[1]:
+                meet_hour = True
+                # print(f'[+] hour-second at {t}')
+        
+        if prev_minute[0] - prev_second[0] == lap_minute - lap_second:
+            if prev_minute[1] > prev_second[1] and pos_minute <= pos_second:
+                meet_minute = True
+                # print(f'[+] minute-second at {t}')
+        else:
+            if prev_minute[1] > prev_second[1]:
+                meet_minute = True
+                # print(f'[+] minute-second at {t}')
+            
+        prev_hour = (lap_hour, pos_hour)
+        prev_minute = (lap_minute, pos_minute)
+        prev_second = (lap_second, pos_second)
+        
+        if meet_hour and meet_minute:
+            if pos_hour == pos_minute:
+                meet_count += 1
+            else:
+                meet_count += 2
+            continue
+        
+        if meet_hour:
+            meet_count += 1
+        if meet_minute:
+            meet_count += 1
+            
+        # if t > 300:
+        #     break
+            
+    return meet_count
+```
